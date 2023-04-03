@@ -14,16 +14,20 @@ import (
 )
 
 const (
-	OTLPProtocol    = "OTEL_EXPORTER_OTLP_PROTOCOL"
-	OTLPEndpoint    = "OTEL_EXPORTER_OTLP_ENDPOINT"
-	OTLPCompression = "OTEL_EXPORTER_OTLP_COMPRESSION"
-	OTLPHeaders     = "OTEL_EXPORTER_OTLP_HEADERS"
-	OTLPPath        = "OTEL_EXPORTER_OTLP_PATH"
+	OTLPProtocol     = "OTEL_EXPORTER_OTLP_PROTOCOL"
+	OTLPEndpoint     = "OTEL_EXPORTER_OTLP_ENDPOINT"
+	OTLPCompression  = "OTEL_EXPORTER_OTLP_COMPRESSION"
+	OTLPHeaders      = "OTEL_EXPORTER_OTLP_HEADERS"
+	OTLPPath         = "OTEL_EXPORTER_OTLP_PATH"
+	OTLPExportEnable = "OTEL_AGENT_ENABLED"
 )
 
 // InitOTLPTracer init export by env
 // headers example: x-otel-project=,x-otel-access-id=,x-otel-access-key=
 func InitOTLPTracer(serverName string, ratio float64) error {
+	if os.Getenv(OTLPExportEnable) == "false" {
+		return nil
+	}
 	protocol := os.Getenv(OTLPProtocol)
 	host := os.Getenv(OTLPEndpoint)
 	headersEnv := os.Getenv(OTLPHeaders)
