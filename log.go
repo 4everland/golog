@@ -128,7 +128,7 @@ func (l *stdLogger) Log(level kratoslog.Level, keyvals ...interface{}) error {
 		}
 	}
 	_ = l.log.Output(4, buf.String()) //nolint:gomnd
-	if level >= kratoslog.LevelError {
+	if level >= kratoslog.LevelError && l.report != nil {
 		rp := l.report()
 		if rp != nil {
 			rp.Report(buf.String())
