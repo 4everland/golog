@@ -2,7 +2,6 @@ package golog
 
 import (
 	"context"
-	"fmt"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -73,21 +72,17 @@ func InitOTLPTracer(serverName string, ratio float64) error {
 	if err != nil {
 		return err
 	}
+	if exp == nil {
+		panic("do not initial export server")
+	}
 
-	opts := []tracesdk.TracerProviderOption{
+	tp := tracesdk.NewTracerProvider(
 		tracesdk.WithSampler(tracesdk.ParentBased(tracesdk.TraceIDRatioBased(ratio))),
+		tracesdk.WithBatcher(exp),
 		tracesdk.WithResource(resource.NewSchemaless(
 			semconv.ServiceNameKey.String(serverName),
 		)),
-	}
-
-	if exp != nil {
-		opts = append(opts, tracesdk.WithBatcher(exp))
-	} else {
-		fmt.Println("do not initial export server")
-	}
-
-	tp := tracesdk.NewTracerProvider(opts...)
+	)
 	otel.SetTracerProvider(tp)
 	return nil
 }
