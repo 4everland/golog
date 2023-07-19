@@ -10,6 +10,7 @@ import (
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -20,7 +21,20 @@ const (
 	OTLPHeaders      = "OTEL_EXPORTER_OTLP_HEADERS"
 	OTLPPath         = "OTEL_EXPORTER_OTLP_PATH"
 	OTLPExportEnable = "OTEL_AGENT_ENABLED"
+	OTLPExportRatio  = "OTEL_EXPORTER_OTLP_RATIO"
 )
+
+func RatioFromEnv() float64 {
+	var ratio = 1.0
+	var envRatio = os.Getenv(OTLPExportRatio)
+	if envRatio != "" {
+		p, err := strconv.ParseFloat(envRatio, 64)
+		if err == nil {
+			ratio = p
+		}
+	}
+	return ratio
+}
 
 // InitOTLPTracer init export by env
 // headers example: x-otel-project=,x-otel-access-id=,x-otel-access-key=

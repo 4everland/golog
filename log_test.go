@@ -7,6 +7,7 @@ import (
 	kratoslog "github.com/go-kratos/kratos/v2/log"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"io"
+	"os"
 	"regexp"
 	"testing"
 )
@@ -74,5 +75,25 @@ func TestLog(t *testing.T) {
 	d, _ = io.ReadAll(buf)
 	if err := matchRegex(string(d)); err != nil {
 		t.Fatalf("%s, err:%s", string(d), err.Error())
+	}
+}
+
+func TestRatioFromEnv(t *testing.T) {
+	os.Setenv(OTLPExportRatio, "0.7")
+	ratio := RatioFromEnv()
+	if ratio != 0.7 {
+		t.Fatalf("ratio: %f should be 0.7", ratio)
+	}
+
+	os.Setenv(OTLPExportRatio, "0.a")
+	ratio = RatioFromEnv()
+	if ratio != 1.0 {
+		t.Fatalf("ratio: %f should be 1.0", ratio)
+	}
+
+	os.Setenv(OTLPExportRatio, "0.777")
+	ratio = RatioFromEnv()
+	if ratio != 0.777 {
+		t.Fatalf("ratio: %f should be 0.777", ratio)
 	}
 }
